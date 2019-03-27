@@ -12,3 +12,12 @@ class Comment(models.Model):
     likes_comments = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(blank=True, null=True)
+
+
+class Reply(models.Model):
+
+    content = models.TextField(null=False, blank=False)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    likes_replies = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
