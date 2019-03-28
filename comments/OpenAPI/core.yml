@@ -1,0 +1,283 @@
+swagger: "2.0"
+
+info:
+  version: 1.0.0
+  title: Comment-Microservice_API
+  description: Job Test Api specification
+
+paths:
+  /comment:
+    get:
+      summary: Fetch all the comment instances
+      description: Authenticated users can access all the comments instances
+      parameters:
+        - name: comment_id
+          in: path
+          description: Retrieve comment instance
+          type: integer
+          required: false
+        - name: search
+          in: query
+          description: Can you this to search by username and content
+          type: string
+          required: false
+        - name: ordering
+          in: query
+          description: Order the results by username and date
+          type: string
+          required: false
+      responses:
+        200:
+          description: A list of comments
+          schema:
+            type: array
+            items:
+              required:
+                - content
+                - user
+              properties:
+                content:
+                  type: string
+                replies:
+                  type: array
+                user:
+                  type: integer
+                likes_comments:
+                  type: integer
+                created_at:
+                  type: string
+    post:
+      summary: Create a new comment instance
+      description: Authenticated users can hit this endpoint to create new comments
+      responses:
+        201:
+          description: Returns new comment instance
+          schema:
+            type: object
+            required:
+              - content
+              - user
+            properties:
+              content:
+                type: string
+              user:
+                type: string
+              likes_comments:
+                type: integer
+  /comment/{comment_id}:
+    get:
+      summary: Get the instance of the comment
+      description: Authenticated users can retrieve data from the comments instances
+      responses:
+        200:
+          description: An instance of the comment
+          schema:
+            type: object
+            items:
+              properties:
+                content:
+                  type: string
+                replies:
+                  type: array
+                user:
+                  type: integer
+                likes_comments:
+                  type: integer
+                created_at:
+                  type: string
+    patch:
+      summary: Update a comment instance
+      description: You can update a comment instance hitting this
+      parameters:
+        - name: comment_id
+          in: path
+          description: This is the reference to the instance of the comment
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Returns updated instance
+          schema:
+            type: object
+            properties:
+              content:
+                type: string
+              user:
+                type: integer
+              likes_comments:
+                type: integer
+    delete:
+      summary: Deletes a comment instance
+      description: Hitting this you delete the instance from db
+      parameters:
+        - name: comment_id
+          in: path
+          description: Reference to the instance
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Returns just the success http response
+
+  /comment/{comment_id}/like:
+    patch:
+      summary: Increment the like in the comment instance
+      description: You can increment the like counter hitting this
+      parameters:
+        - name: comment_id
+          in: path
+          description: This is the reference to the instance of comment
+          type: integer
+          required: true
+      responses:
+        200:
+          description: HTTP response 200
+          schema:
+            type: object
+            items:
+              properties:
+                content:
+                  type: string
+                replies:
+                  type: array
+                user:
+                  type: integer
+                likes_comments:
+                  type: integer
+                created_at:
+                  type: string
+  /reply:
+    get:
+      summary: Fetch all the reply instances
+      description: Authenticated users can access all the reply instances
+      parameters:
+        - name: reply
+          in: path
+          description: Retrieve reply instance
+          type: integer
+          required: false
+        - name: search
+          in: query
+          description: Can you this to search by username and content
+          type: string
+          required: false
+        - name: ordering
+          in: query
+          description: Order the results by username and date
+          type: string
+          required: false
+      responses:
+        200:
+          description: A list of replies
+          schema:
+            type: array
+            items:
+              required:
+                - content
+                - user
+              properties:
+                content:
+                  type: string
+                comment:
+                  type: integer
+                likes_replies:
+                  type: integer
+                created_at:
+                  type: string
+    post:
+      summary: Create a new reply instance
+      description: Authenticated users can hit this endpoint to create new replies
+      responses:
+        201:
+          description: Returns new reply instance
+          schema:
+            type: object
+            required:
+              - content
+              - comment
+            properties:
+              content:
+                type: string
+              comment:
+                type: integer
+              likes_replies:
+                type: integer
+
+  /reply/{reply_id}:
+    get:
+      summary: Get the instance of the reply
+      description: Authenticated users can retrieve data from the reply instances
+      responses:
+        200:
+          description: An instance of the reply
+          schema:
+            type: object
+            items:
+              properties:
+                content:
+                  type: string
+                comment:
+                  type: integer
+                likes_replies:
+                  type: integer
+                created_at:
+                  type: string
+    patch:
+      summary: Update a reply instance
+      description: You can update a reply instance hitting this
+      parameters:
+        - name: reply_id
+          in: path
+          description: This is the reference to the instance of reply
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Returns updated reply instance
+          schema:
+            type: object
+            properties:
+              content:
+                type: string
+              user:
+                type: integer
+              likes_replies:
+                type: integer
+    delete:
+      summary: Deletes a reply instance
+      description: Hitting this you delete the reply instance from db
+      parameters:
+        - name: reply_id
+          in: path
+          description: Reference to the reply instance
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Returns just the success http response
+
+  /reply/{reply_id}/like:
+    patch:
+      summary: Increment the like in reply instance
+      description: You can increment the like counter hitting this
+      parameters:
+        - name: reply_id
+          in: path
+          description: This is the reference to the instance of the reply
+          type: integer
+          required: true
+      responses:
+        200:
+          description: HTTP response 200
+          schema:
+            type: object
+            items:
+              properties:
+                content:
+                  type: string
+                comment:
+                  type: integer
+                likes_replies:
+                  type: integer
+                created_at:
+                  type: string

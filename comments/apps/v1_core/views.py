@@ -27,7 +27,7 @@ class CommentAPIView(
     serializer_class = CommentSerializer
     permission_classes = IsAuthenticated,
     filter_backends = (filters.SearchFilter, filters.OrderingFilter,)
-    search_fields = ('user__username',)
+    search_fields = ('user__username', 'content',)
     ordering_fields = ('username', 'created_at',)
 
     def get_object(self):
@@ -107,11 +107,11 @@ class LikeCommentAPIView(
     def get_serializer_class(self):
         return CommentSerializer
 
-    def put(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         comment_instance = Comment.objects.get(pk=self.kwargs['comment_id'])
         comment_instance.likes_comments += 1
         comment_instance.save()
-        return super().put(request, *args, **kwargs)
+        return super().patch(request, *args, **kwargs)
 
 
 class LikeReplyAPIView(
@@ -125,8 +125,8 @@ class LikeReplyAPIView(
     def get_serializer_class(self):
         return ReplySerializer
 
-    def put(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         reply_instance = Reply.objects.get(pk=self.kwargs['reply_id'])
         reply_instance.likes_replies += 1
         reply_instance.save()
-        return super().put(request, *args, **kwargs)
+        return super().patch(request, *args, **kwargs)

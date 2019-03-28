@@ -88,20 +88,20 @@ class UpdateCommentTestCase(APIViewBaseTest):
             'content': 'this is a comment',
             'user': self.user,
         }
-        self.put_data = {'content': 'updated_comment'}
+        self.patch_data = {'content': 'updated_comment'}
 
     def test_user_able_to_update_comment(self):
         self.client.login(username='user@test.com', password='thisisapassword')
         instance = Comment.objects.create(**self.comment_data)
         response = self.client.patch(
-            f'/api/comment/{instance.id}/', self.put_data, follow=True,
+            f'/api/comment/{instance.id}/', self.patch_data, follow=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn(response.data['content'], self.put_data['content'])
+        self.assertIn(response.data['content'], self.patch_data['content'])
         self.assertEqual(
             Comment.objects.get(
                 pk=instance.id,
-            ).content, self.put_data['content'],
+            ).content, self.patch_data['content'],
         )
         self.assertNotEqual(
             Comment.objects.get(
@@ -261,7 +261,7 @@ class ReplyAPITestCase(APIViewBaseTest):
             'content': 'this is a reply to the comment',
             'comment': self.comment.id,
         }
-        self.put_data = {
+        self.patch_data = {
             'content': 'this is the updated reply',
         }
         User.objects.create_user(
@@ -288,14 +288,14 @@ class ReplyAPITestCase(APIViewBaseTest):
             comment=self.comment,
         )
         response = self.client.patch(
-            f'/api/reply/{reply.id}/', self.put_data, follow=True,
+            f'/api/reply/{reply.id}/', self.patch_data, follow=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn(response.data['content'], self.put_data['content'])
+        self.assertIn(response.data['content'], self.patch_data['content'])
         self.assertEqual(
             Reply.objects.get(
                 pk=reply.id,
-            ).content, self.put_data['content'],
+            ).content, self.patch_data['content'],
         )
         self.assertNotEqual(
             Comment.objects.get(
@@ -342,17 +342,17 @@ class TestLikeUpdateView(APITestCase):
     def test_value_comment_like_change_at_request(self):
         self.client.login(username='like@test.com', password='thisisapassword')
         before = self.comment.likes_comments
-        response = self.client.put(
+        response = self.client.patch(
             f'/api/comment/{self.comment.id}/like', data={'user': self.user.id},  # NOQA
         )
+        self.assertEqual(response.status_code, 200)
         after = response.data['likes_comments']
         self.assertEqual(after, (before + 1))
-        self.assertEqual(response.status_code, 200)
 
     def test_value_reply_like_change_at_request(self):
         self.client.login(username='like@test.com', password='thisisapassword')
         before = self.reply.likes_replies
-        response = self.client.put(
+        response = self.client.patch(
             f'/api/reply/{self.reply.id}/like', data={'comment': self.comment.id},  # NOQA
         )
         after = response.data['likes_replies']

@@ -8,6 +8,10 @@ User = get_user_model()
 
 class CommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        default=serializers.CurrentUserDefault(),
+    )
 
     class Meta:
         model = Comment
