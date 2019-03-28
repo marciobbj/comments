@@ -5,11 +5,12 @@
 * `pip install -r requirements.txt`
 * `python manage.py makemigrations`
 * `python manage.py migrate`
+* `python manage.py createsuperuser`
 
 #### Endpoints: 
-* `/api/comments/`
-* `/api/comments/<comment_id>/`
-* `/api/comments/<comment_id>/like/`
+* `/api/comment/`
+* `/api/comment/<comment_id>/`
+* `/api/comment/<comment_id>/like/`
 * `/api/reply/`
 * `/api/reply/<reply_id>/`
 * `/api/reply/<reply_id>/like/`
