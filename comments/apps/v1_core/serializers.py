@@ -19,8 +19,23 @@ class CommentSerializer(serializers.ModelSerializer):
     def get_replies(self, instance):
         return Reply.objects.filter(comment=instance.id).values('content')
 
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields()
+        request = self.context.get('request', None)
+        if request and getattr(request, 'method', None) == 'PUT':
+            fields['content'].required = False
+        return fields
+
 
 class ReplySerializer(serializers.ModelSerializer):
     class Meta:
         model = Reply
         fields = ('content', 'comment', 'likes_replies', 'created_at',)
+        read_only = 'likes_replies',
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields()
+        request = self.context.get('request', None)
+        if request and getattr(request, 'method', None) == 'PATCH' or 'PUT':
+            fields['content'].required = False
+        return fields

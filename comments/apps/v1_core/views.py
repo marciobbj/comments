@@ -4,6 +4,7 @@ from apps.v1_core.serializers import CommentSerializer
 from apps.v1_core.serializers import ReplySerializer
 from django.contrib.auth import get_user_model
 from rest_framework import filters
+from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import status
 from rest_framework import viewsets
@@ -51,10 +52,7 @@ class CommentAPIView(
         instance = Comment.objects.get(pk=comment_id)
         instance.content = self.request.data['content']
         instance.save()
-        return Response(
-            data={'response': 'updated'},
-            status=status.HTTP_200_OK,
-        )
+        return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -90,12 +88,45 @@ class ReplyAPIView(
         instance = Reply.objects.get(pk=reply_id)
         instance.content = self.request.data['content']
         instance.save()
-        return Response(
-            data={'response': 'updated'},
-            status=status.HTTP_200_OK,
-        )
+        return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_200_OK)
+
+
+class LikeCommentAPIView(
+    generics.UpdateAPIView,
+):
+    lookup_url_kwarg = 'comment_id'
+
+    def get_queryset(self):
+        return Comment.objects.all()
+
+    def get_serializer_class(self):
+        return CommentSerializer
+
+    def put(self, request, *args, **kwargs):
+        comment_instance = Comment.objects.get(pk=self.kwargs['comment_id'])
+        comment_instance.likes_comments += 1
+        comment_instance.save()
+        return super().put(request, *args, **kwargs)
+
+
+class LikeReplyAPIView(
+    generics.UpdateAPIView,
+):
+    lookup_url_kwarg = 'reply_id'
+
+    def get_queryset(self):
+        return Reply.objects.all()
+
+    def get_serializer_class(self):
+        return ReplySerializer
+
+    def put(self, request, *args, **kwargs):
+        reply_instance = Reply.objects.get(pk=self.kwargs['reply_id'])
+        reply_instance.likes_replies += 1
+        reply_instance.save()
+        return super().put(request, *args, **kwargs)

@@ -97,7 +97,7 @@ class UpdateCommentTestCase(APIViewBaseTest):
             f'/api/comment/{instance.id}/', self.put_data, follow=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn(response.data['response'], 'updated')
+        self.assertIn(response.data['content'], self.put_data['content'])
         self.assertEqual(
             Comment.objects.get(
                 pk=instance.id,
@@ -291,7 +291,7 @@ class ReplyAPITestCase(APIViewBaseTest):
             f'/api/reply/{reply.id}/', self.put_data, follow=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn(response.data['response'], 'updated')
+        self.assertIn(response.data['content'], self.put_data['content'])
         self.assertEqual(
             Reply.objects.get(
                 pk=reply.id,
@@ -319,3 +319,42 @@ class ReplyAPITestCase(APIViewBaseTest):
         counter_after_request = Reply.objects.count()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(counter_after_request, (counter_before_request - 1))
+
+
+class TestLikeUpdateView(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='like@test.com', password='thisisapassword',
+        )
+        self.comment = Comment.objects.create(
+            content='this awesome comment',
+            user=self.user,
+        )
+        self.reply_data = {
+            'content': 'this is a reply to the comment',
+            'comment': self.comment,
+        }
+        self.reply = Reply.objects.create(
+            content='reply to this comment',
+            comment=self.comment,
+        )
+
+    def test_value_comment_like_change_at_request(self):
+        self.client.login(username='like@test.com', password='thisisapassword')
+        before = self.comment.likes_comments
+        response = self.client.put(
+            f'/api/comment/{self.comment.id}/like', data={'user': self.user.id},  # NOQA
+        )
+        after = response.data['likes_comments']
+        self.assertEqual(after, (before + 1))
+        self.assertEqual(response.status_code, 200)
+
+    def test_value_reply_like_change_at_request(self):
+        self.client.login(username='like@test.com', password='thisisapassword')
+        before = self.reply.likes_replies
+        response = self.client.put(
+            f'/api/reply/{self.reply.id}/like', data={'comment': self.comment.id},  # NOQA
+        )
+        after = response.data['likes_replies']
+        self.assertEqual(after, (before + 1))
+        self.assertEqual(response.status_code, 200)
