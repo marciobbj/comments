@@ -14,6 +14,10 @@
 * `/api/reply/<reply_id>/like/`
 * `/api/swagger/`
 
+#### Search and Ordering
+* `/api/comments/?search=<username>/<comment_content>`
+* `/api/comments/?ordering={created_at/-created_at/user}`
+
 #### OpenAPI
 * `.yml` spec can be found @ `OpenAPI/core.yml`
 
