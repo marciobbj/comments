@@ -1,15 +1,14 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import render
-
 # Create your views here.
 from rest_framework import mixins, viewsets, status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.utils import json
 
 from apps.v1_core.models import Comment
 from apps.v1_core.serializers import CommentSerializer
 
 User = get_user_model()
+
 
 class CommentAPIView(
     mixins.CreateModelMixin,
@@ -21,10 +20,15 @@ class CommentAPIView(
 ):
     lookup_url_kwarg = 'instance_id'
     serializer_class = CommentSerializer
-    queryset = Comment.objects.all()
+    permission_classes = IsAuthenticated,
 
     def get_object(self):
         return Comment.objects.get(pk=self.kwargs['instance_id'])
+
+    def get_queryset(self):
+        return Comment.objects.filter(
+            user=self.request.user
+        )
 
     def update(self, request, *args, **kwargs):
         comment_id = self.kwargs.get('instance_id', None)
