@@ -7,6 +7,7 @@ User = get_user_model()
 
 
 class Comment(models.Model):
+
     content = models.TextField(blank=False, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     likes_comments = models.IntegerField(default=0)
