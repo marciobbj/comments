@@ -1,6 +1,7 @@
 ### Django Rest API comment microservice
 
 #### Hack it locally
+* `cd comments`
 * `pip install -r requirements.txt`
 * `python manage.py makemigrations`
 * `python manage.py migrate`
