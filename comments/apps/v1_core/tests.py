@@ -162,7 +162,7 @@ class FetchCommentTestCase(APIViewBaseTest):
         )
         response = self.client.get('/api/comment/', follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 7)
+        self.assertEqual(len(response.data), len(self.comments))
 
     def test_get_all_comments_user_1(self):
         self.client.login(
@@ -247,3 +247,75 @@ class FetchCommentTestCase(APIViewBaseTest):
         )
         result_expected = JSONRenderer().render(serializer.data)
         self.assertEqual(result_expected, response.content)
+
+
+class ReplyAPITestCase(APIViewBaseTest):
+
+    def setUp(self):
+        super().setUp()
+        self.comment = Comment.objects.create(
+            content='this is a comment',
+            user=self.user,
+        )
+        self.reply_data = {
+            'content': 'this is a reply to the comment',
+            'comment': self.comment.id,
+        }
+        self.put_data = {
+            'content': 'this is the updated reply',
+        }
+        User.objects.create_user(
+            username='reply@test.com', password='thisisapassword',
+        )
+
+    def test_user_able_to_submit_reply(self):
+        self.client.login(
+            username='reply@test.com',
+            password='thisisapassword',
+        )
+        response = self.client.post(
+            '/api/reply/', data=self.reply_data, follow=True,
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_user_able_to_update_reply(self):
+        self.client.login(
+            username='reply@test.com',
+            password='thisisapassword',
+        )
+        reply = Reply.objects.create(
+            content='this is a reply to the comment',
+            comment=self.comment,
+        )
+        response = self.client.patch(
+            f'/api/reply/{reply.id}/', self.put_data, follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(response.data['response'], 'updated')
+        self.assertEqual(
+            Reply.objects.get(
+                pk=reply.id,
+            ).content, self.put_data['content'],
+        )
+        self.assertNotEqual(
+            Comment.objects.get(
+                pk=reply.id,
+            ).content, self.reply_data['content'],
+        )
+
+    def test_user_able_to_delete_reply(self):
+        self.client.login(
+            username='reply@test.com',
+            password='thisisapassword',
+        )
+        reply = Reply.objects.create(
+            content='this is a reply to the comment',
+            comment=self.comment,
+        )
+        counter_before_request = Reply.objects.count()
+        response = self.client.delete(
+            f'/api/comment/{reply.id}/', follow=True,
+        )
+        counter_after_request = Reply.objects.count()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(counter_after_request, (counter_before_request - 1))
