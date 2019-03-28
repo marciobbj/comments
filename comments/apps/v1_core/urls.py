@@ -13,11 +13,11 @@ router.register('reply', ReplyAPIView, base_name='reply')
 urlpatterns = [
     path('', include(router.urls)),
     path(
-        'comment/<int:comment_id>/like',
+        'comment/<int:comment_id>/like/',
         LikeCommentAPIView.as_view(), name='like_comment',
     ),
     path(
-        'reply/<int:reply_id>/like',
+        'reply/<int:reply_id>/like/',
         LikeReplyAPIView.as_view(), name='like_reply',
     ),
 ]
