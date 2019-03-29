@@ -109,6 +109,16 @@ class UpdateCommentTestCase(APIViewBaseTest):
             ).content, self.comment_data['content'],
         )
 
+    def test_update_at_field_is_working(self):
+        self.client.login(username='user@test.com', password='thisisapassword')
+        instance = Comment.objects.create(**self.comment_data)
+        self.assertEqual(instance.updated_at, None)
+        response = self.client.patch(
+            f'/api/comment/{instance.id}/', self.patch_data, follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(instance.updated_at, response.data['updated_at'])
+
 
 class DeleteCommentTestCase(APIViewBaseTest):
 
@@ -129,6 +139,18 @@ class DeleteCommentTestCase(APIViewBaseTest):
         counter_after_request = Comment.objects.count()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(counter_after_request, (counter_before_request - 1))
+
+    def test_all_replies_attached_were_deleted(self):
+        self.client.login(username='user@test.com', password='thisisapassword')
+        comment_instance = Comment.objects.create(**self.comment_data)
+        number_of_replies_created = 4
+        for i in range(number_of_replies_created):
+            Reply.objects.create(
+                content=f'Reply number {i}', comment=comment_instance,
+            )
+        self.client.delete(f'/api/comment/{comment_instance.id}/')
+        reply_counter = Reply.objects.count()
+        self.assertEqual(reply_counter, 0)
 
 
 class FetchCommentTestCase(APIViewBaseTest):
@@ -302,6 +324,18 @@ class ReplyAPITestCase(APIViewBaseTest):
                 pk=reply.id,
             ).content, self.reply_data['content'],
         )
+
+    def test_update_at_field_reply_is_working(self):
+        self.client.login(username='user@test.com', password='thisisapassword')
+        instance = Reply.objects.create(
+            comment=self.comment, content='this is a reply',
+        )
+        self.assertEqual(instance.updated_at, None)
+        response = self.client.patch(
+            f'/api/reply/{instance.id}/', self.patch_data, follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(instance.updated_at, response.data['updated_at'])
 
     def test_user_able_to_delete_reply(self):
         self.client.login(

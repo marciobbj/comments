@@ -3,6 +3,7 @@ from apps.v1_core.models import Reply
 from apps.v1_core.serializers import CommentSerializer
 from apps.v1_core.serializers import ReplySerializer
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from rest_framework import filters
 from rest_framework import generics
 from rest_framework import mixins
@@ -50,6 +51,7 @@ class CommentAPIView(
                 status=status.HTTP_400_BAD_REQUEST,
             )
         instance = Comment.objects.get(pk=comment_id)
+        instance.updated_at = timezone.now()
         instance.content = self.request.data['content']
         instance.save()
         return super().update(request, *args, **kwargs)
@@ -87,6 +89,7 @@ class ReplyAPIView(
             )
         instance = Reply.objects.get(pk=reply_id)
         instance.content = self.request.data['content']
+        instance.updated_at = timezone.now()
         instance.save()
         return super().update(request, *args, **kwargs)
 

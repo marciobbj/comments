@@ -7,7 +7,7 @@
 * `python manage.py migrate`
 * `python manage.py createsuperuser`
 
-#### Endpoints: 
+#### Endpoints:
 * `/api/comment/`
 * `/api/comment/<comment_id>/`
 * `/api/comment/<comment_id>/like/`
@@ -22,4 +22,3 @@
 
 #### OpenAPI
 * `.yml` spec can be found @ `OpenAPI/core.yml`
-

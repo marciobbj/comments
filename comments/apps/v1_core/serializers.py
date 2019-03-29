@@ -18,10 +18,14 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = (
             'content', 'replies', 'user',
             'likes_comments', 'created_at',
+            'updated_at',
         )
 
     def get_replies(self, instance):
-        return Reply.objects.filter(comment=instance.id).values('content')
+        replies = Reply.objects\
+            .filter(comment=instance.id)\
+            .values()
+        return replies
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields()
@@ -34,7 +38,10 @@ class CommentSerializer(serializers.ModelSerializer):
 class ReplySerializer(serializers.ModelSerializer):
     class Meta:
         model = Reply
-        fields = ('content', 'comment', 'likes_replies', 'created_at',)
+        fields = (
+            'content', 'comment', 'likes_replies',
+            'created_at', 'updated_at',
+        )
         read_only = 'likes_replies',
 
     def get_fields(self, *args, **kwargs):
