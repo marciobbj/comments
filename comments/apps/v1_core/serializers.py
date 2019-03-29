@@ -26,7 +26,7 @@ class CommentSerializer(serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields()
         request = self.context.get('request', None)
-        if request and getattr(request, 'method', None) == 'PUT':
+        if request and getattr(request, 'method', None) == 'PATCH':
             fields['content'].required = False
         return fields
 
@@ -40,6 +40,6 @@ class ReplySerializer(serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields()
         request = self.context.get('request', None)
-        if request and getattr(request, 'method', None) == 'PATCH' or 'PUT':
+        if request and getattr(request, 'method', None) == 'PATCH':
             fields['content'].required = False
         return fields

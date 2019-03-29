@@ -343,7 +343,8 @@ class TestLikeUpdateView(APITestCase):
         self.client.login(username='like@test.com', password='thisisapassword')
         before = self.comment.likes_comments
         response = self.client.patch(
-            f'/api/comment/{self.comment.id}/like', data={'user': self.user.id},  # NOQA
+            f'/api/comment/{self.comment.id}/like/', data={'user': self.user.id},  # NOQA
+            follow=True,
         )
         self.assertEqual(response.status_code, 200)
         after = response.data['likes_comments']
@@ -353,7 +354,7 @@ class TestLikeUpdateView(APITestCase):
         self.client.login(username='like@test.com', password='thisisapassword')
         before = self.reply.likes_replies
         response = self.client.patch(
-            f'/api/reply/{self.reply.id}/like', data={'comment': self.comment.id},  # NOQA
+            f'/api/reply/{self.reply.id}/like/', data={'comment': self.comment.id},  # NOQA
         )
         after = response.data['likes_replies']
         self.assertEqual(after, (before + 1))
